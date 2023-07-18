@@ -17,7 +17,6 @@ public class AjoutProprietaire {
     private double superficieParcelle;
     private double latitudeParcelle;
     private double longitudeParcelle;
-    private String descriptionRegionParcelle;
 
     private Connection cn;
     private JPanel ParcelForm;

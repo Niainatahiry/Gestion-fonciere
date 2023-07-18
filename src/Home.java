@@ -9,8 +9,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import org.jdesktop.swingx.*;
 
-
-
 public class Home extends JFrame {
     private JButton ajoutParcelleBtn;
     private JPanel homePanel;
@@ -38,7 +36,6 @@ public class Home extends JFrame {
         JLabel backgroundLabel = new JLabel(scaledBackground);
         backgroundLabel.setBounds(0, 0, 900, 700);
         layeredPane.add(backgroundLabel, JLayeredPane.DEFAULT_LAYER);
-
 
         // Home panel with components
         homePanel = new JPanel();
@@ -91,7 +88,7 @@ public class Home extends JFrame {
         table.setFont(table.getFont().deriveFont(Font.BOLD, 11));
         table.setDragEnabled(true); // Activation du défilement horizontal
         scrollPane = new JScrollPane(table);
-        scrollPane.setBounds(100, 100, 760, 470);
+        scrollPane.setBounds(30, 100, 830, 470);
         homePanel.add(scrollPane);
 
         setContentPane(layeredPane);
@@ -111,6 +108,7 @@ public class Home extends JFrame {
             ResultSet resultSet = statement.executeQuery();
 
             DefaultTableModel model = new DefaultTableModel();
+            model.addColumn("id");
             model.addColumn("Nom");
             model.addColumn("Prénom");
             model.addColumn("Adresse");
@@ -119,20 +117,22 @@ public class Home extends JFrame {
             model.addColumn(""); // Colonne vide pour le bouton "Afficher plus"
 
             while (resultSet.next()) {
+                int id = resultSet.getInt("owner_id");
                 String nom = resultSet.getString("nom");
                 String prenom = resultSet.getString("prenom");
                 String adresse = resultSet.getString("adresse");
                 String email = resultSet.getString("email");
                 String telephone = resultSet.getString("telephone");
 
-                Object[] rowData = new Object[]{nom, prenom, adresse, email, telephone, "Afficher plus"};
+                Object[] rowData = new Object[]{id, nom, prenom, adresse, email, telephone, "Afficher plus"};
                 model.addRow(rowData);
             }
 
             table.setModel(model);
 
             // Rendu personnalisé pour la dernière colonne (bouton "Afficher plus")
-            table.getColumnModel().getColumn(5).setCellRenderer(new ButtonRenderer());
+            table.getColumnModel().getColumn(6).setCellRenderer(new ButtonRenderer());
+            table.getColumnModel().getColumn(6).setCellEditor(new ButtonEditor());
 
             statement.close();
         } catch (SQLException e) {
@@ -157,6 +157,55 @@ public class Home extends JFrame {
         }
     }
 
+    private class ButtonEditor extends DefaultCellEditor {
+        private JButton button;
+        private String label;
+        private boolean isPushed;
+
+        public ButtonEditor() {
+            super(new JCheckBox());
+            button = new JButton();
+            button.setOpaque(true);
+            button.addActionListener(e -> fireEditingStopped());
+        }
+
+        @Override
+        public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
+            if (isSelected) {
+                button.setForeground(table.getSelectionForeground());
+                button.setBackground(table.getSelectionBackground());
+            } else {
+                button.setForeground(table.getForeground());
+                button.setBackground(UIManager.getColor("Button.background"));
+            }
+
+            label = (value == null) ? "" : value.toString();
+            button.setText(label);
+            isPushed = true;
+            return button;
+        }
+
+        @Override
+        public Object getCellEditorValue() {
+            if (isPushed) {
+                // Action du bouton "Afficher plus"
+                JOptionPane.showMessageDialog(button, "ID : " + table.getValueAt(table.getSelectedRow(), 0));
+            }
+            isPushed = false;
+            return label;
+        }
+
+        @Override
+        public boolean stopCellEditing() {
+            isPushed = false;
+            return super.stopCellEditing();
+        }
+
+        @Override
+        protected void fireEditingStopped() {
+            super.fireEditingStopped();
+        }
+    }
 
     public static void main(String[] args) throws IOException {
         SwingUtilities.invokeLater(() -> {
