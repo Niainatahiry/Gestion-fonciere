@@ -22,7 +22,7 @@ public class AjoutProprietaire {
     private JPanel ParcelForm;
     private JLabel ProprietaireTitre, NomLabel, PrenomLabel, AdresseLabel, EmailLabel, TelephoneLabel;
     private JTextField NomField, PrenomField, AdresseField, EmailField, TelephoneField;
-    private JButton boutonSuivant;
+    private JButton boutonSuivant, boutonDejaProprietaire;
 
     public AjoutProprietaire(Connection cn, JPanel ParcelForm, String adresseParcelle, String superficieParcelle, String latitudeParcelle, String longitudeParcelle, String descriptionParcelle) {
         this.cn = cn;
@@ -93,6 +93,13 @@ public class AjoutProprietaire {
         boutonSuivant.setFont(new Font("Arial", Font.BOLD, 12));
         boutonSuivant.setBackground(new Color(50, 120, 50));
         boutonSuivant.setForeground(Color.WHITE);
+
+        boutonDejaProprietaire = new JButton("Déjà propriétaire");
+        boutonDejaProprietaire.setBounds(140, 450, 140, 30);
+        boutonDejaProprietaire.setFont(new Font("Arial", Font.BOLD, 12));
+        boutonDejaProprietaire.setBackground(new Color(150, 150, 50));
+        boutonDejaProprietaire.setForeground(Color.WHITE);
+        ParcelForm.add(boutonDejaProprietaire);
 
         try {
             Image iconImage = ImageIO.read(getClass().getResource("/resources/verifier.png"));
@@ -214,7 +221,6 @@ public class AjoutProprietaire {
                 boutonSuivant.setVisible(false);
                 AjoutActePropriete ajoutActePropriete = new AjoutActePropriete(cn, ParcelForm, parcelId, ownerId);
                 ajoutActePropriete.afficherFormulaire();
-                //ParcelForm.getParent().add(ajoutActePropriete.afficherFormulaire());
             } else {
                 JOptionPane.showMessageDialog(ParcelForm, "Une erreur s'est produite lors de la récupération des ID de parcelle et de propriétaire.",
                         "Erreur d'ID", JOptionPane.ERROR_MESSAGE);

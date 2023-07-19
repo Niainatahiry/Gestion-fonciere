@@ -1,13 +1,16 @@
+import org.jdesktop.swingx.JXTable;
+
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableCellRenderer;
 import java.awt.*;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import org.jdesktop.swingx.*;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.Image;
 
 public class Home extends JFrame {
     private JButton ajoutParcelleBtn;
@@ -132,78 +135,12 @@ public class Home extends JFrame {
 
             // Rendu personnalisé pour la dernière colonne (bouton "Afficher plus")
             table.getColumnModel().getColumn(6).setCellRenderer(new ButtonRenderer());
-            table.getColumnModel().getColumn(6).setCellEditor(new ButtonEditor());
+            table.getColumnModel().getColumn(6).setCellEditor(new ButtonEditor(table));
 
             statement.close();
         } catch (SQLException e) {
             e.printStackTrace();
             JOptionPane.showMessageDialog(this, "Erreur lors de la recherche.", "Erreur", JOptionPane.ERROR_MESSAGE);
-        }
-    }
-
-    private class ButtonRenderer extends JButton implements TableCellRenderer {
-        public ButtonRenderer() {
-            setOpaque(true);
-            setBackground(new Color(50, 120, 50));
-            setForeground(Color.WHITE);
-            setBorder(BorderFactory.createEmptyBorder());
-            setFont(getFont().deriveFont(Font.BOLD));
-        }
-
-        @Override
-        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-            setText(value.toString());
-            return this;
-        }
-    }
-
-    private class ButtonEditor extends DefaultCellEditor {
-        private JButton button;
-        private String label;
-        private boolean isPushed;
-
-        public ButtonEditor() {
-            super(new JCheckBox());
-            button = new JButton();
-            button.setOpaque(true);
-            button.addActionListener(e -> fireEditingStopped());
-        }
-
-        @Override
-        public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
-            if (isSelected) {
-                button.setForeground(table.getSelectionForeground());
-                button.setBackground(table.getSelectionBackground());
-            } else {
-                button.setForeground(table.getForeground());
-                button.setBackground(UIManager.getColor("Button.background"));
-            }
-
-            label = (value == null) ? "" : value.toString();
-            button.setText(label);
-            isPushed = true;
-            return button;
-        }
-
-        @Override
-        public Object getCellEditorValue() {
-            if (isPushed) {
-                // Action du bouton "Afficher plus"
-                JOptionPane.showMessageDialog(button, "ID : " + table.getValueAt(table.getSelectedRow(), 0));
-            }
-            isPushed = false;
-            return label;
-        }
-
-        @Override
-        public boolean stopCellEditing() {
-            isPushed = false;
-            return super.stopCellEditing();
-        }
-
-        @Override
-        protected void fireEditingStopped() {
-            super.fireEditingStopped();
         }
     }
 
